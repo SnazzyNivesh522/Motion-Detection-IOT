@@ -8,7 +8,6 @@ const EventList = () => {
     const fetchEvents = async () => {
       try {
         const response = await api.get('/events');
-        console.log(response.data); // Check the response data
         setEvents(response.data);
       } catch (error) {
         console.error("Error fetching events:", error);
@@ -25,7 +24,7 @@ const EventList = () => {
           events.map(event => (
             <div key={event.id} className="col-md-4 mb-4">
               <div className="card">
-                <img src={`/image/${event.image_path}`} className="card-img-top" alt={`Event ${event.id}`} />
+                <img src={`${api.defaults.baseURL}/image/${event.image}`} className="card-img-top" alt={`Event ${event.id}`} />
                 <div className="card-body">
                   <h5 className="card-title">Classified Person: {event.classified_person}</h5>
                   <p className="card-text"><small className="text-muted">{new Date(event.timestamp).toLocaleString()}</small></p>

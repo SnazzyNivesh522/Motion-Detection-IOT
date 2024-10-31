@@ -10,16 +10,21 @@ const ImageUpload = () => {
   };
 
   const handleUpload = async () => {
+    if (!file) {
+      setMessage('Please select a file to upload.');
+      return;
+    }
     const formData = new FormData();
     formData.append('file', file);
     
     try {
       const response = await api.post('/upload', formData);
-      setMessage(response.data.message);
+      setMessage(`Classified as: ${response.data.classified_person}`);
     } catch (error) {
       setMessage('Upload failed');
     }
   };
+  
 
   return (
     <div className="mb-4">
