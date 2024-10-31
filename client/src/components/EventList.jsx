@@ -13,12 +13,14 @@ const EventList = () => {
         console.error("Error fetching events:", error);
       }
     };
-    fetchEvents();
+    const intervalId = setInterval(fetchEvents, 3000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
     <div>
-      <h2 className="text-center mt-4">Uploaded Events</h2>
+      <h2 className="text-center mt-4">Event Tracking Details</h2>
       <div className="row">
         {Array.isArray(events) && events.length > 0 ? (
           events.map(event => (
