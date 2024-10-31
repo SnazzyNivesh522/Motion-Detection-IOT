@@ -3,6 +3,10 @@
 *.keras
 *.h5
 
+#venv related files
+venv/
+.venv/
+server_venv/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
