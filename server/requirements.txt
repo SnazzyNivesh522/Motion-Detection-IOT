@@ -1,0 +1,9 @@
+flask 
+flask_sqlalchemy
+pymongo 
+flask_cors 
+tensorflow 
+pillow
+python-dotenv
+numpy
+werkzeug
