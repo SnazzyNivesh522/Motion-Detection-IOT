@@ -19,7 +19,7 @@ def upload_image():
     if file and allowed_file(file.filename):
         unique_filename = save_securely(file)
         classified_person = classify_image(os.path.join(Config.UPLOAD_FOLDER,unique_filename))
-        event=Event(image_path=unique_filename,classified_person=classified_person)
+        event=Event(image=unique_filename,classified_person=classified_person)
         db.session.add(event)
         db.session.commit()
         return jsonify({'classified_person': classified_person}), 201

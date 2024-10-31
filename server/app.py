@@ -1,6 +1,7 @@
 from flask import Flask
-from extensions import db, cors
+from extensions import db
 from routes import routes_blueprint
+from flask_cors import CORS
 from config import Config
 
 def create_app():
@@ -8,7 +9,7 @@ def create_app():
     app.config.from_object(Config)
 
     db.init_app(app)
-    cors.init_app(app)
+    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
     app.register_blueprint(routes_blueprint)
 
