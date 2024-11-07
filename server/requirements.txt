@@ -2,8 +2,9 @@ flask
 flask_sqlalchemy
 pymongo 
 flask_cors 
-tensorflow 
+ultralytics
 pillow
 python-dotenv
 numpy
 werkzeug
+face_recognition
