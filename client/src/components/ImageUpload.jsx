@@ -19,7 +19,7 @@ const ImageUpload = () => {
     
     try {
       const response = await api.post('/upload', formData);
-      setMessage(`Classified as: ${response.data.classified_person}`);
+      setMessage(`Recognized faces: ${response.data.recognized_faces}`);
     } catch (error) {
       setMessage('Upload failed');
     }

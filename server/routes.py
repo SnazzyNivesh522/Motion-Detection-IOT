@@ -1,4 +1,4 @@
-from flask import Blueprint,request,jsonify, send_from_directory
+from flask import Blueprint,request,jsonify, send_from_directory,url_for
 from utils import allowed_file,save_securely,recognize_faces
 import os
 from config import Config
@@ -21,14 +21,17 @@ def upload_image():
         uploaded_image_path = os.path.join(Config.UPLOAD_FOLDER, unique_filename)
 
         # Perform face recognition
-        recognized_faces = recognize_faces(uploaded_image_path)
-
+        annotated_image_path, faces = recognize_faces(uploaded_image_path)
+        print(faces)
+        
         # Save event in the database
-        event = Event(image=unique_filename, classified_person=", ".join(recognized_faces))
+        event = Event(image=unique_filename, classified_person=", ".join(faces),annotated_image=annotated_image_path)
         db.session.add(event)
         db.session.commit()
 
-        return jsonify({'recognized_faces': recognized_faces}), 201
+        annotated_image_url = url_for('routes.get_image', filename=os.path.basename(annotated_image_path), _external=True)
+
+        return jsonify({'recognized_faces': faces, 'annotated_image_url': annotated_image_url}), 201
     else:
         return jsonify({'error': 'Allowed file types are png, jpg, jpeg'}), 400
 

@@ -6,6 +6,7 @@ import numpy as np
 from werkzeug.utils import secure_filename
 import uuid
 from config import Config
+import cv2
 
 def load_known_faces(directory):
     known_faces = []
@@ -24,36 +25,19 @@ def load_known_faces(directory):
 
 known_faces_dir = 'Training_images'
 known_faces, known_names = [], []
-if os.path.exists(known_faces_dir):
-    known_faces, known_names = load_known_faces(known_faces_dir)
+# Load known faces
+known_faces, known_names = load_known_faces(known_faces_dir)
+print(f"Loaded {len(known_faces)} known faces: {', '.join(known_names)}")
 
-attendance_file = 'attendance.csv'
-def mark_attendance(name, attendance_file):
-    now = datetime.now()
-    date = now.strftime("%Y-%m-%d")
-    time = now.strftime("%H:%M:%S")
-
-    if not os.path.isfile(attendance_file):
-        with open(attendance_file, 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(["Name", "Date", "Time"])
-
-    with open(attendance_file, 'r+', newline='') as f:
-        reader = csv.reader(f)
-        existing_entries = [row[0] for row in list(reader)]
-        if name not in existing_entries:
-            writer = csv.writer(f)
-            writer.writerow([name, date, time])
 
 def recognize_faces(image_path):
-    # Load the uploaded image
     image = face_recognition.load_image_file(image_path)
-
-    # Detect faces and get encodings
     face_locations = face_recognition.face_locations(image)
     face_encodings = face_recognition.face_encodings(image, face_locations)
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-    recognized_names = []
+    name_confidences = {}
+    recognized_faces = []
 
     for face_encoding in face_encodings:
         face_distances = face_recognition.face_distance(known_faces, face_encoding)
@@ -61,14 +45,26 @@ def recognize_faces(image_path):
 
         if face_distances[best_match_index] < 0.6:
             name = known_names[best_match_index]
-            recognized_names.append(name)
-            mark_attendance(name, attendance_file)
+            confidence = 1 - face_distances[best_match_index]
+            name_confidences[name] = max(name_confidences.get(name, 0), confidence)
         else:
-            recognized_names.append("Unknown")
+            name = "Unknown"
+            confidence = 0.0
 
-    return recognized_names
+        label = f"{name} ({confidence:.2f})"
+        recognized_faces.append(label)
 
+        for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
+            cv2.rectangle(image, (left, top), (right, bottom), (0, 255, 0), 2)
+            cv2.putText(image, label, (left + 6, bottom - 6), cv2.FONT_HERSHEY_DUPLEX, 0.5, (255, 255, 255), 1)
+        print(f"Face at ({left}, {top}, {right}, {bottom}): {label}")
 
+    # Save the annotated image to display in the frontend
+    annotated_filename = f"annotated_{uuid.uuid4()}_{os.path.basename(image_path)}"
+    annotated_image_path = os.path.join(Config.UPLOAD_FOLDER, annotated_filename)
+    cv2.imwrite(annotated_image_path, image)
+
+    return annotated_filename, recognized_faces
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in Config.ALLOWED_EXTENSIONS
