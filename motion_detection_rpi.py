@@ -7,7 +7,7 @@ from gpiozero import MotionSensor
 #https://gpiozero.readthedocs.io/en/latest/api_input.html#gpiozero.MotionSensor
 
 PIR_PIN = 4  # PIR sensor is connected to GPIO pin 4
-IMAGE_DIR = "/home/pi/captured_images" # Directory to save captured images
+IMAGE_DIR = "captured_images" # Directory to save captured images
 SERVER_URL="http://localhost:5000/upload" #flask server api
 
 pir = MotionSensor(PIR_PIN)
@@ -67,4 +67,3 @@ def main():
 if __name__ == "__main__":
     main()
     
-
