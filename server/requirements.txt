@@ -2,7 +2,6 @@ flask
 flask_sqlalchemy
 pymongo 
 flask_cors 
-ultralytics
 pillow
 python-dotenv
 numpy
